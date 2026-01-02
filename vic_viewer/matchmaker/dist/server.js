@@ -21,6 +21,9 @@ if (!fs.existsSync(BANNERS_DIR)) {
 // Servir banners estáticamente
 app.use('/banners', express.static(BANNERS_DIR));
 
+// Servir imágenes/logos estáticamente
+app.use('/img', express.static(__dirname));
+
 // Configurar multer para subir banners
 const bannerStorage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, BANNERS_DIR),
@@ -588,24 +591,29 @@ const subdomainLandingCSS = `
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #0f3460 100%); color: #eee; min-height: 100vh; display: flex; flex-direction: column; }
     .hero { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px 20px; }
-    .logo { font-size: 48px; margin-bottom: 10px; }
-    .company-name { font-size: 36px; font-weight: bold; color: #00d4ff; margin-bottom: 10px; }
-    .tagline { font-size: 18px; color: #888; margin-bottom: 40px; }
-    .code-display { background: linear-gradient(135deg, #16213e 0%, #0f3460 100%); border: 2px solid #00d4ff; border-radius: 16px; padding: 30px 50px; margin-bottom: 40px; }
-    .code-label { color: #888; font-size: 14px; margin-bottom: 10px; }
-    .code { font-size: 64px; font-weight: bold; color: #fff; letter-spacing: 12px; font-family: 'Consolas', monospace; text-shadow: 0 0 20px rgba(0,212,255,0.5); }
-    .buttons { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
-    .btn { padding: 18px 40px; border: none; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s; }
-    .btn-primary { background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #000; }
-    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,212,255,0.4); }
-    .btn-secondary { background: transparent; border: 2px solid #00d4ff; color: #00d4ff; }
-    .btn-secondary:hover { background: #00d4ff22; }
-    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; max-width: 900px; margin-top: 60px; }
-    .feature { background: #1a1a2e88; border-radius: 12px; padding: 25px; text-align: center; }
-    .feature-icon { font-size: 36px; margin-bottom: 15px; }
-    .feature h3 { color: #00d4ff; margin-bottom: 10px; }
-    .feature p { color: #888; font-size: 14px; }
-    .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; border-top: 1px solid #333; }
+    .logo-img { width: 180px; height: auto; margin-bottom: 30px; filter: drop-shadow(0 0 30px rgba(0,212,255,0.3)); }
+    .company-name { font-size: 42px; font-weight: bold; color: #fff; margin-bottom: 8px; text-shadow: 0 2px 20px rgba(0,0,0,0.5); }
+    .tagline { font-size: 18px; color: #00d4ff; margin-bottom: 50px; font-weight: 500; }
+    .download-section { background: linear-gradient(135deg, #16213e 0%, #0f3460 100%); border: 2px solid #00d4ff33; border-radius: 24px; padding: 50px 60px; margin-bottom: 40px; max-width: 500px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+    .download-title { font-size: 20px; color: #888; margin-bottom: 25px; }
+    .download-subtitle { font-size: 15px; color: #666; margin-bottom: 30px; }
+    .btn { padding: 20px 50px; border: none; border-radius: 14px; font-size: 18px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 12px; transition: all 0.3s; }
+    .btn-primary { background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%); color: #000; width: 100%; justify-content: center; }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0,212,255,0.4); }
+    .btn-secondary { background: transparent; border: 2px solid #00d4ff55; color: #00d4ff; margin-top: 15px; width: 100%; justify-content: center; font-size: 15px; padding: 14px 30px; }
+    .btn-secondary:hover { background: #00d4ff15; border-color: #00d4ff; }
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; max-width: 800px; margin-top: 50px; }
+    .feature { background: #1a1a2e55; border-radius: 16px; padding: 25px 20px; text-align: center; border: 1px solid #ffffff08; }
+    .feature-icon { font-size: 32px; margin-bottom: 12px; }
+    .feature h3 { color: #fff; margin-bottom: 8px; font-size: 15px; font-weight: 600; }
+    .feature p { color: #666; font-size: 13px; line-height: 1.5; }
+    .footer { text-align: center; padding: 25px; color: #444; font-size: 13px; border-top: 1px solid #ffffff08; }
+    .footer a { color: #00d4ff; text-decoration: none; }
+    @media (max-width: 768px) {
+        .features { grid-template-columns: 1fr; }
+        .download-section { padding: 35px 25px; margin: 0 15px 30px; }
+        .company-name { font-size: 32px; }
+    }
 </style>`;
 
 // ============== LANDING PAGE PRINCIPAL ==============
@@ -616,7 +624,7 @@ const mainLandingHTML = `<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vicviewer® - Software de Escritorio Remoto Profesional</title>
     <meta name="description" content="Vicviewer® es la solución profesional de escritorio remoto con conexión instantánea, máxima seguridad y la menor latencia del mercado. Ideal para soporte técnico y trabajo remoto.">
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" href="/img/Vicviewer_00.png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
@@ -1040,27 +1048,25 @@ app.get('/', (req, res) => {
     if (req.subdomainUser) {
         const user = req.subdomainUser;
         return res.send(`<!DOCTYPE html><html><head>
-            <title>${user.company_name || user.name} - Soporte Remoto</title>
+            <title>${user.company_name || user.name} - Soporte Remoto Profesional</title>
             <meta name="viewport" content="width=device-width, initial-scale=1">
-            <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+            <meta name="description" content="Descarga el software de soporte remoto de ${user.company_name || user.name}. Conexión segura y rápida.">
+            <link rel="icon" type="image/png" href="/img/Vicviewer_00.png">
             ${subdomainLandingCSS}
         </head><body>
             <div class="hero">
-                <div class="logo">🖥️</div>
+                <img src="/img/vicviewer_02_trn.png" alt="Vicviewer" class="logo-img">
                 <div class="company-name">${user.company_name || user.name}</div>
-                <div class="tagline">Sistema de Soporte Remoto Seguro</div>
+                <div class="tagline">Soporte Remoto Profesional</div>
                 
-                <div class="code-display">
-                    <div class="code-label">Tu código de soporte</div>
-                    <div class="code">${user.company_code}</div>
-                </div>
-                
-                <div class="buttons">
+                <div class="download-section">
+                    <div class="download-title">Software de Asistencia Remota</div>
+                    <div class="download-subtitle">Descarga e instala para recibir soporte técnico de manera segura</div>
                     <a href="/api/download/Vicviewer${user.company_code}.exe" class="btn btn-primary">
-                        📥 Descargar Software
+                        📥 Descargar Ahora
                     </a>
                     <a href="/login" class="btn btn-secondary">
-                        👤 Acceder al Panel
+                        👤 Acceder a Mi Panel
                     </a>
                 </div>
                 
@@ -1068,22 +1074,22 @@ app.get('/', (req, res) => {
                     <div class="feature">
                         <div class="feature-icon">🔒</div>
                         <h3>Conexión Segura</h3>
-                        <p>Cifrado de extremo a extremo para proteger tu información</p>
+                        <p>Cifrado de extremo a extremo</p>
                     </div>
                     <div class="feature">
                         <div class="feature-icon">⚡</div>
                         <h3>Ultra Rápido</h3>
-                        <p>Tecnología WebRTC para la menor latencia posible</p>
+                        <p>Tecnología de baja latencia</p>
                     </div>
                     <div class="feature">
-                        <div class="feature-icon">🛠️</div>
+                        <div class="feature-icon">✨</div>
                         <h3>Fácil de Usar</h3>
-                        <p>Sin instalación compleja, ejecuta y comparte tu código</p>
+                        <p>Solo ejecuta y listo</p>
                     </div>
                 </div>
             </div>
             <div class="footer">
-                Powered by Vicviewer® &copy; ${new Date().getFullYear()}
+                Powered by <a href="https://vicviewer.com" target="_blank">Vicviewer®</a> &copy; ${new Date().getFullYear()}
             </div>
         </body></html>`);
     }
@@ -1175,6 +1181,11 @@ app.get('/favicon.ico', (req, res) => {
 app.get('/favicon.svg', (req, res) => {
     res.set('Content-Type', 'image/svg+xml');
     res.send(faviconSvg);
+});
+
+// Favicon PNG - Vicviewer_00
+app.get('/favicon.png', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Vicviewer_00.png'));
 });
 
 // Crear sesión
@@ -1616,7 +1627,7 @@ app.delete('/api/users/:id', (req, res) => {
 
 // ============== ESTILOS CSS ==============
 const adminCSS = `
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/img/Vicviewer_00.png">
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #0f0f1a; color: #eee; min-height: 100vh; }
@@ -1664,7 +1675,7 @@ const adminCSS = `
 
 const adminHeader = (currentPath = '') => `
 <div class="header">
-    <div class="logo"><img src="/favicon.svg" alt="Vicviewer®"> Vicviewer® Admin</div>
+    <div class="logo"><img src="/img/Vicviewer_00.png" alt="Vicviewer®" style="width:32px;height:32px;vertical-align:middle;margin-right:10px"> Vicviewer® Admin</div>
     <nav class="nav">
         <a href="/admin" ${currentPath === 'dashboard' ? 'style="color:#00d4ff"' : ''}>Dashboard</a>
         <a href="/admin/users" ${currentPath === 'users' ? 'style="color:#00d4ff"' : ''}>Usuarios</a>
@@ -2525,7 +2536,7 @@ setInterval(() => {
 
 // ============== ESTILOS CSS PANEL DE USUARIO ==============
 const userCSS = `
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/img/Vicviewer_00.png">
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #0f0f1a; color: #eee; min-height: 100vh; }
