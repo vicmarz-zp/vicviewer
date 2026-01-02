@@ -2593,10 +2593,11 @@ const userHeader = (user, currentPath = '') => `
 app.get('/login', (req, res) => {
     const error = req.query.error;
     const success = req.query.success;
-    res.send(`<!DOCTYPE html><html><head><title>Iniciar Sesión - Vicviewer®</title>${userCSS}</head><body>
+    res.send(`<!DOCTYPE html><html><head><title>Iniciar Sesión - Vicviewer®</title><link rel="icon" type="image/png" href="/img/Vicviewer_00.png">${userCSS}</head><body>
     <div class="login-container">
         <div class="login-box">
-            <h1>🖥️ Vicviewer®</h1>
+            <img src="/img/vicviewer_02_trn.png" alt="Vicviewer" style="width:180px;margin-bottom:20px">
+            <h1 style="margin-top:0">Iniciar Sesión</h1>
             ${error ? '<div class="alert alert-error">Credenciales incorrectas</div>' : ''}
             ${success === 'verified' ? '<div class="alert alert-success">✅ Email verificado. Ya puedes iniciar sesión.</div>' : ''}
             ${success === 'reset' ? '<div class="alert alert-success">✅ Contraseña actualizada. Ya puedes iniciar sesión.</div>' : ''}
@@ -2664,10 +2665,11 @@ app.post('/login', (req, res) => {
 
 app.get('/register', (req, res) => {
     const error = req.query.error;
-    res.send(`<!DOCTYPE html><html><head><title>Registro - Vicviewer®</title>${userCSS}</head><body>
+    res.send(`<!DOCTYPE html><html><head><title>Registro - Vicviewer®</title><link rel="icon" type="image/png" href="/img/Vicviewer_00.png">${userCSS}</head><body>
     <div class="login-container">
         <div class="login-box">
-            <h1>🖥️ Crear Cuenta</h1>
+            <img src="/img/vicviewer_02_trn.png" alt="Vicviewer" style="width:180px;margin-bottom:20px">
+            <h1 style="margin-top:0">Crear Cuenta</h1>
             ${error === 'exists' ? '<div class="alert alert-error">Este email ya está registrado</div>' : ''}
             ${error === 'password' ? '<div class="alert alert-error">Las contraseñas no coinciden</div>' : ''}
             <form method="POST" action="/register">
@@ -2764,10 +2766,11 @@ app.get('/verify-email', (req, res) => {
 
 app.get('/forgot-password', (req, res) => {
     const sent = req.query.sent;
-    res.send(`<!DOCTYPE html><html><head><title>Recuperar Contraseña</title>${userCSS}</head><body>
+    res.send(`<!DOCTYPE html><html><head><title>Recuperar Contraseña</title><link rel="icon" type="image/png" href="/img/Vicviewer_00.png">${userCSS}</head><body>
     <div class="login-container">
         <div class="login-box">
-            <h1>🔑 Recuperar Contraseña</h1>
+            <img src="/img/vicviewer_02_trn.png" alt="Vicviewer" style="width:180px;margin-bottom:20px">
+            <h1 style="margin-top:0">Recuperar Contraseña</h1>
             ${sent ? '<div class="alert alert-success">Si el email existe, te enviamos instrucciones.</div>' : ''}
             <form method="POST" action="/forgot-password">
                 <div class="form-group">
@@ -2824,10 +2827,11 @@ app.get('/reset-password', (req, res) => {
         </div></body></html>`);
     }
     
-    res.send(`<!DOCTYPE html><html><head><title>Nueva Contraseña</title>${userCSS}</head><body>
+    res.send(`<!DOCTYPE html><html><head><title>Nueva Contraseña</title><link rel="icon" type="image/png" href="/img/Vicviewer_00.png">${userCSS}</head><body>
     <div class="login-container">
         <div class="login-box">
-            <h1>🔑 Nueva Contraseña</h1>
+            <img src="/img/vicviewer_02_trn.png" alt="Vicviewer" style="width:180px;margin-bottom:20px">
+            <h1 style="margin-top:0">Nueva Contraseña</h1>
             ${error ? '<div class="alert alert-error">Las contraseñas no coinciden</div>' : ''}
             <form method="POST" action="/reset-password">
                 <input type="hidden" name="token" value="${token}">
@@ -3197,11 +3201,12 @@ app.get('/download/:code', (req, res) => {
         </div></div></body></html>`);
     }
     
-    res.send(`<!DOCTYPE html><html><head><title>Vicviewer® - ${user.company_name || user.name}</title>${userCSS}</head><body>
+    res.send(`<!DOCTYPE html><html><head><title>Vicviewer® - ${user.company_name || user.name}</title><link rel="icon" type="image/png" href="/img/Vicviewer_00.png">${userCSS}</head><body>
     <div class="login-container">
         <div class="download-box" style="max-width:500px">
-            <h2>🖥️ Vicviewer®</h2>
-            <p style="color:#888">Descarga el software de control remoto</p>
+            <img src="/img/vicviewer_02_trn.png" alt="Vicviewer" style="width:200px;margin-bottom:20px">
+            <h2 style="margin-top:0">Control Remoto Profesional</h2>
+            <p style="color:#888">Descarga el software para ${user.company_name || user.name}</p>
             <div class="code">${code}</div>
             <p style="color:#aaa;margin-bottom:20px">Código de empresa: <strong>${user.company_name || user.name}</strong></p>
             <a href="/api/download/Vicviewer${code}.exe" class="btn btn-primary" style="padding:15px 40px;font-size:16px">
