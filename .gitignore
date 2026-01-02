@@ -1,0 +1,23 @@
+﻿# Node modules
+node_modules/
+
+# Build outputs
+build/
+*.obj
+*.pdb
+*.ilk
+*.exp
+*.lib
+
+# IDE
+.vs/
+.vscode/
+*.suo
+*.user
+
+# Backup
+_legacy/
+
+# Temp files
+*.log
+temp_*

@@ -1,0 +1,22 @@
+# Build outputs
+vicviewer/build/
+*.obj
+*.lib
+*.dll
+*.exe
+*.pdb
+*.ilk
+*.log
+
+# Dependencies
+_deps/
+
+# IDE
+.vs/
+*.suo
+*.user
+*.vcxproj.user
+
+# Temp
+*.tmp
+temp*/

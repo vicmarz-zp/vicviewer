@@ -1,0 +1,40 @@
+// VicViewer Resources
+#include <windows.h>
+
+// Define icon ID
+#define IDI_APPICON 101
+
+// Icon
+IDI_APPICON ICON "vicviewer.ico"
+
+// Version Info
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION 1,5,2,0
+PRODUCTVERSION 1,5,2,0
+FILEFLAGSMASK 0x3fL
+FILEFLAGS 0x0L
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_APP
+FILESUBTYPE VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "0C0A04b0"  // Spanish (Mexico) + Unicode
+        BEGIN
+            VALUE "CompanyName", "Control Remoto MX"
+            VALUE "FileDescription", "Vicviewer\xAE - Software de Soporte Remoto Profesional"
+            VALUE "FileVersion", "1.5.2.0"
+            VALUE "InternalName", "Vicviewer"
+            VALUE "LegalCopyright", "Copyright \xA9 2026 Control Remoto MX. Todos los derechos reservados."
+            VALUE "LegalTrademarks", "Vicviewer\xAE es una marca registrada de Control Remoto MX"
+            VALUE "OriginalFilename", "Vicviewer.exe"
+            VALUE "ProductName", "Vicviewer\xAE - Soporte Remoto"
+            VALUE "ProductVersion", "1.5.2.0"
+            VALUE "Comments", "www.vicviewer.com"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0C0A, 1200  // Spanish (Mexico), Unicode
+    END
+END
