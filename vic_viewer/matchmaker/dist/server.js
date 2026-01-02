@@ -591,9 +591,8 @@ const subdomainLandingCSS = `
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #0f3460 100%); color: #eee; min-height: 100vh; display: flex; flex-direction: column; }
     .hero { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px 20px; }
-    .logo-img { width: 180px; height: auto; margin-bottom: 30px; filter: drop-shadow(0 0 30px rgba(0,212,255,0.3)); }
-    .company-name { font-size: 42px; font-weight: bold; color: #fff; margin-bottom: 8px; text-shadow: 0 2px 20px rgba(0,0,0,0.5); }
-    .tagline { font-size: 18px; color: #00d4ff; margin-bottom: 50px; font-weight: 500; }
+    .logo-img { width: 180px; height: auto; margin-bottom: 20px; filter: drop-shadow(0 0 30px rgba(0,212,255,0.3)); }
+    .company-name { font-size: 42px; font-weight: bold; color: #fff; margin-bottom: 30px; text-shadow: 0 2px 20px rgba(0,0,0,0.5); }
     .download-section { background: linear-gradient(135deg, #16213e 0%, #0f3460 100%); border: 2px solid #00d4ff33; border-radius: 24px; padding: 50px 60px; margin-bottom: 40px; max-width: 500px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
     .download-title { font-size: 20px; color: #888; margin-bottom: 25px; }
     .download-subtitle { font-size: 15px; color: #666; margin-bottom: 30px; }
@@ -1052,7 +1051,6 @@ app.get('/', (req, res) => {
             <div class="hero">
                 <img src="/img/vicviewer_02_trn.png" alt="Vicviewer" class="logo-img">
                 <div class="company-name">${user.company_name || user.name}</div>
-                <div class="tagline">Soporte Remoto Profesional</div>
                 
                 <div class="download-section">
                     <div class="download-title">Software de Asistencia Remota</div>
@@ -3335,7 +3333,6 @@ app.get('/:code', (req, res, next) => {
         <div class="hero">
             <img src="/img/vicviewer_02_trn.png" alt="Vicviewer" class="logo-img">
             <div class="company-name">${user.company_name || user.name}</div>
-            <div class="tagline">Soporte Remoto Profesional</div>
             
             <div class="download-section">
                 <div class="download-title">Software de Asistencia Remota</div>
