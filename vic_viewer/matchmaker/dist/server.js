@@ -2957,20 +2957,20 @@ app.get('/panel/profile', userAuthMiddleware, (req, res) => {
             </form>
         </div>
         
-        ${user.company_code ? \`
+        ${user.company_code ? `
         <div class="card">
             <h3>🔐 Contraseña de Servicio</h3>
             <p style="color:#888;margin-bottom:15px">Esta contraseña se requiere para instalar VicViewer como servicio de Windows o usar código fijo en los equipos.</p>
             <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px">
                 <div style="background:#16213e;padding:15px 25px;border-radius:8px;border:2px solid #0f3460">
                     <span style="color:#888;font-size:12px;display:block;margin-bottom:5px">Contraseña actual:</span>
-                    <code id="servicePwd" style="font-size:24px;letter-spacing:4px;color:#00d4ff">\${user.service_password || '-----'}</code>
+                    <code id="servicePwd" style="font-size:24px;letter-spacing:4px;color:#00d4ff">${user.service_password || '-----'}</code>
                 </div>
                 <button type="button" onclick="generateServicePwd()" class="btn btn-success" style="padding:15px 20px">🔄 Generar Nueva</button>
             </div>
             <p style="color:#ff6b6b;font-size:13px">⚠️ Si genera una nueva contraseña, la anterior dejará de funcionar inmediatamente.</p>
         </div>
-        \` : ''}
+        ` : ''}
         
         ${user.custom_banner && user.company_code ? `
         <div class="card">
