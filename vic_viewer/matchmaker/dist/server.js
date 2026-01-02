@@ -2161,8 +2161,8 @@ app.get('/admin/users/:id/edit', authMiddleware, (req, res) => {
             <h4 style="margin-bottom:15px">📥 Información de Distribución</h4>
             ${user.company_code ? `
             <p style="color:#888;margin-bottom:10px">📁 Nombre del ejecutable: <code style="font-size:16px">Vicviewer${user.company_code}.exe</code></p>
-            <p style="color:#888;margin-bottom:10px">🔗 Enlace de descarga: <a href="/download/${user.company_code}" style="color:#00d4ff" target="_blank">/download/${user.company_code}</a></p>
-            ${user.has_subdomain ? `<p style="color:#888">🌐 Subdominio: <a href="https://${user.company_code.toLowerCase()}.vicviewer.com" style="color:#00d4ff" target="_blank">${user.company_code.toLowerCase()}.vicviewer.com</a></p>` : ''}
+            <p style="color:#888;margin-bottom:10px">🌐 Micrositio: <a href="/${user.company_code}" style="color:#00d4ff" target="_blank">vicviewer.com/${user.company_code}</a></p>
+            <p style="color:#888">🔗 Descarga directa: <a href="/download/${user.company_code}" style="color:#00d4ff" target="_blank">vicviewer.com/download/${user.company_code}</a></p>
             ` : '<p style="color:#ff6b6b">⚠️ Asigna un código de empresa para generar enlace de descarga</p>'}
         </div>
         
@@ -2893,10 +2893,9 @@ app.get('/panel', userAuthMiddleware, (req, res) => {
             <h2>📥 Tu Código de Empresa</h2>
             <div class="code">${user.company_code}</div>
             <p style="color:#888;margin-bottom:15px">Este código identifica tu empresa en Vicviewer®</p>
-            ${user.has_subdomain ? `
-            <p style="margin-top:15px"><strong>Tu enlace personalizado:</strong><br>
-            <a href="https://${user.company_code.toLowerCase()}.vicviewer.com" style="color:#00d4ff">${user.company_code.toLowerCase()}.vicviewer.com</a></p>
-            ` : ''}
+            <p style="margin-top:15px"><strong>Tu micrositio personalizado:</strong><br>
+            <a href="/${user.company_code}" style="color:#00d4ff;font-size:18px" target="_blank">vicviewer.com/${user.company_code}</a></p>
+            <p style="margin-top:10px;color:#888">Comparte este enlace con tus clientes para que descarguen el software</p>
         </div>
         ` : `
         <div class="alert alert-info">Tu código de empresa aún no ha sido asignado. Contacta al administrador.</div>
@@ -3307,6 +3306,70 @@ app.post('/api/user/generate-service-password', userAuthMiddleware, (req, res) =
 app.get('/api/user/service-password', userAuthMiddleware, (req, res) => {
     const user = db.prepare(`SELECT service_password FROM users WHERE id = ?`).get(req.user.id);
     res.json({ servicePassword: user?.service_password || null });
+});
+
+// ============== MICROSITIO POR CÓDIGO (debe ir al final) ==============
+// Ruta /:code - Micrositio profesional por código de empresa
+app.get('/:code', (req, res, next) => {
+    const code = req.params.code.toUpperCase();
+    
+    // Ignorar rutas conocidas (favicon, api, etc)
+    if (['FAVICON.ICO', 'ROBOTS.TXT', 'SITEMAP.XML'].includes(code)) {
+        return next();
+    }
+    
+    const user = db.prepare('SELECT * FROM users WHERE company_code = ? AND status = ?').get(code, 'active');
+    
+    if (!user) {
+        return next(); // Dejar que Express maneje 404
+    }
+    
+    // Renderizar micrositio profesional
+    res.send(`<!DOCTYPE html><html><head>
+        <title>${user.company_name || user.name} - Soporte Remoto Profesional</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Descarga el software de soporte remoto de ${user.company_name || user.name}. Conexión segura y rápida.">
+        <link rel="icon" type="image/png" href="/img/Vicviewer_00.png">
+        ${subdomainLandingCSS}
+    </head><body>
+        <div class="hero">
+            <img src="/img/vicviewer_02_trn.png" alt="Vicviewer" class="logo-img">
+            <div class="company-name">${user.company_name || user.name}</div>
+            <div class="tagline">Soporte Remoto Profesional</div>
+            
+            <div class="download-section">
+                <div class="download-title">Software de Asistencia Remota</div>
+                <div class="download-subtitle">Descarga e instala para recibir soporte técnico de manera segura</div>
+                <a href="/api/download/Vicviewer${user.company_code}.exe" class="btn btn-primary">
+                    📥 Descargar Ahora
+                </a>
+                <a href="/login" class="btn btn-secondary">
+                    👤 Acceder a Mi Panel
+                </a>
+            </div>
+            
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Conexión Segura</h3>
+                    <p>Cifrado de extremo a extremo</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Ultra Rápido</h3>
+                    <p>Tecnología de baja latencia</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">✨</div>
+                    <h3>Fácil de Usar</h3>
+                    <p>Solo ejecuta y listo</p>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            Powered by <a href="https://vicviewer.com" target="_blank">Vicviewer®</a> &copy; ${new Date().getFullYear()}
+        </div>
+    </body></html>`);
 });
 
 app.listen(PORT, '0.0.0.0', () => {
