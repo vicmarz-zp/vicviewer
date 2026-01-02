@@ -633,8 +633,8 @@ const mainLandingHTML = `<!DOCTYPE html>
         /* Header */
         .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(10,10,18,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid #1a1a2e; }
         .nav { max-width: 1200px; margin: 0 auto; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-        .nav-logo { font-size: 24px; font-weight: 700; color: #00d4ff; text-decoration: none; display: flex; align-items: center; gap: 10px; }
-        .nav-logo svg { width: 32px; height: 32px; }
+        .nav-logo { font-size: 24px; font-weight: 700; color: #00d4ff; text-decoration: none; display: flex; align-items: center; gap: 12px; }
+        .nav-logo img { height: 40px; width: auto; }
         .nav-links { display: flex; gap: 30px; align-items: center; }
         .nav-links a { color: #888; text-decoration: none; font-size: 14px; transition: color 0.3s; }
         .nav-links a:hover { color: #00d4ff; }
@@ -732,12 +732,7 @@ const mainLandingHTML = `<!DOCTYPE html>
     <header class="header">
         <nav class="nav">
             <a href="/" class="nav-logo">
-                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="100" height="100" rx="20" fill="#00d4ff"/>
-                    <rect x="15" y="15" width="70" height="50" rx="8" fill="white"/>
-                    <rect x="30" y="72" width="40" height="8" rx="4" fill="white"/>
-                </svg>
-                Vicviewer®
+                <img src="/img/vicviewer_02_trn.png" alt="Vicviewer">
             </a>
             <div class="nav-links">
                 <a href="#features">Características</a>
@@ -1174,8 +1169,7 @@ const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100
 </svg>`;
 
 app.get('/favicon.ico', (req, res) => {
-    res.set('Content-Type', 'image/svg+xml');
-    res.send(faviconSvg);
+    res.sendFile(path.join(__dirname, 'Vicviewer_00.png'));
 });
 
 app.get('/favicon.svg', (req, res) => {
