@@ -11,6 +11,7 @@
 #include <winsock2.h>   // Para obtener IP local (antes de windows.h conceptualmente)
 #include <ws2tcpip.h>   // Para inet_ntop
 #include <iphlpapi.h>   // Para GetAdaptersAddresses
+#include <shlobj.h>     // Para SHGetFolderPath (AppData)
 #include <objidl.h>     // Necesario antes de gdiplus.h
 #include <gdiplus.h>    // Para cargar imagenes PNG
 #include <CommCtrl.h>
@@ -328,8 +329,18 @@ constexpr const wchar_t* BANNER_DEFAULT_CODE = L"0000";
 constexpr const wchar_t* BANNER_SERVER_URL = L"vicviewer.com";
 constexpr const wchar_t* BANNER_PATH = L"/banners/";
 
-// Obtiene el directorio de banners (junto al exe)
+// Obtiene el directorio de banners (en AppData, oculto del usuario)
 std::wstring getBannerDirectory() {
+    wchar_t appData[MAX_PATH] = {0};
+    if (SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_LOCAL_APPDATA, nullptr, 0, appData))) {
+        std::wstring dir(appData);
+        dir += L"\\VicViewer\\cache\\";
+        // Crear directorios si no existen
+        CreateDirectoryW((std::wstring(appData) + L"\\VicViewer").c_str(), nullptr);
+        CreateDirectoryW(dir.c_str(), nullptr);
+        return dir;
+    }
+    // Fallback al directorio del exe
     wchar_t exePath[MAX_PATH] = {0};
     GetModuleFileNameW(nullptr, exePath, MAX_PATH);
     std::wstring dir(exePath);
@@ -337,7 +348,8 @@ std::wstring getBannerDirectory() {
     if (lastSlash != std::wstring::npos) {
         dir = dir.substr(0, lastSlash + 1);
     }
-    dir += L"banners\\";
+    dir += L".cache\\";
+    CreateDirectoryW(dir.c_str(), nullptr);
     return dir;
 }
 
@@ -439,18 +451,48 @@ std::wstring getBannerLocalPath(const std::wstring& companyCode) {
     return getBannerDirectory() + companyCode + L".png";
 }
 
+// Obtiene el directorio junto al exe (para banner por defecto embebido)
+std::wstring getExeDirectory() {
+    wchar_t exePath[MAX_PATH] = {0};
+    GetModuleFileNameW(nullptr, exePath, MAX_PATH);
+    std::wstring dir(exePath);
+    size_t lastSlash = dir.find_last_of(L"\\\\/");
+    if (lastSlash != std::wstring::npos) {
+        dir = dir.substr(0, lastSlash + 1);
+    }
+    return dir;
+}
+
 // Descarga el banner si no existe localmente
 // Retorna la ruta del banner a usar (empresa si pagado, default si no)
+// Prioridad: 1) Cache AppData, 2) Junto al exe, 3) Descargar del servidor
 std::wstring ensureBannerExists(const std::string& companyCode, bool isPaidAccount) {
-    std::wstring bannerDir = getBannerDirectory();
-    CreateDirectoryW(bannerDir.c_str(), nullptr);
+    std::wstring cacheDir = getBannerDirectory();
+    std::wstring exeDir = getExeDirectory();
     
-    std::wstring defaultBanner = bannerDir + BANNER_DEFAULT_CODE + L".png";
+    // Banner por defecto: primero verificar en cache, luego junto al exe
+    std::wstring defaultBannerCache = cacheDir + BANNER_DEFAULT_CODE + L".png";
+    std::wstring defaultBannerExe = exeDir + BANNER_DEFAULT_CODE + L".png";
+    std::wstring defaultBanner = defaultBannerCache;
     
-    // Siempre asegurarse que el banner por defecto existe
-    if (GetFileAttributesW(defaultBanner.c_str()) == INVALID_FILE_ATTRIBUTES) {
-        std::wstring serverPath = std::wstring(BANNER_PATH) + BANNER_DEFAULT_CODE + L".png";
-        downloadFile(BANNER_SERVER_URL, serverPath, defaultBanner);
+    // Si no está en cache, verificar junto al exe
+    if (GetFileAttributesW(defaultBannerCache.c_str()) == INVALID_FILE_ATTRIBUTES) {
+        if (GetFileAttributesW(defaultBannerExe.c_str()) != INVALID_FILE_ATTRIBUTES) {
+            // Copiar al cache desde exe dir
+            CopyFileW(defaultBannerExe.c_str(), defaultBannerCache.c_str(), FALSE);
+        } else {
+            // Descargar del servidor
+            std::wstring serverPath = std::wstring(BANNER_PATH) + BANNER_DEFAULT_CODE + L".png";
+            downloadFile(BANNER_SERVER_URL, serverPath, defaultBannerCache);
+        }
+    }
+    
+    // Verificar si el archivo existe después de intentar obtenerlo
+    if (GetFileAttributesW(defaultBannerCache.c_str()) == INVALID_FILE_ATTRIBUTES) {
+        // Última opción: usar el del directorio exe si existe
+        if (GetFileAttributesW(defaultBannerExe.c_str()) != INVALID_FILE_ATTRIBUTES) {
+            defaultBanner = defaultBannerExe;
+        }
     }
     
     // Si no hay company code o no es cuenta pagada, usar default
@@ -460,14 +502,14 @@ std::wstring ensureBannerExists(const std::string& companyCode, bool isPaidAccou
     
     // Intentar obtener banner de la empresa
     std::wstring companyCodeW = utf8ToWide(companyCode);
-    std::wstring companyBanner = bannerDir + companyCodeW + L".png";
+    std::wstring companyBanner = cacheDir + companyCodeW + L".png";
     
-    // Si ya existe, usarlo
+    // Si ya existe en cache, usarlo
     if (GetFileAttributesW(companyBanner.c_str()) != INVALID_FILE_ATTRIBUTES) {
         return companyBanner;
     }
     
-    // Intentar descargar banner de la empresa
+    // Intentar descargar banner de la empresa desde el servidor
     std::wstring serverPath = std::wstring(BANNER_PATH) + companyCodeW + L".png";
     if (downloadFile(BANNER_SERVER_URL, serverPath, companyBanner)) {
         return companyBanner;
@@ -826,7 +868,8 @@ void updateTabVisibility(MainWindowState* state) {
     if (state->hostQualityCombo) ShowWindow(state->hostQualityCombo, hostVisible ? SW_SHOW : SW_HIDE);
     if (state->hostQualityLabel) ShowWindow(state->hostQualityLabel, hostVisible ? SW_SHOW : SW_HIDE);
     if (state->hostMetricsLabel) ShowWindow(state->hostMetricsLabel, hostVisible ? SW_SHOW : SW_HIDE);
-    if (state->bannerStatic) ShowWindow(state->bannerStatic, hostVisible ? SW_SHOW : SW_HIDE);
+    // Banner siempre visible en todas las pestañas
+    if (state->bannerStatic) ShowWindow(state->bannerStatic, SW_SHOW);
     
     // Viewer controls
     if (state->viewerCodeEdit) ShowWindow(state->viewerCodeEdit, viewerVisible ? SW_SHOW : SW_HIDE);
@@ -1481,10 +1524,13 @@ void createControls(MainWindowState* state, HWND parent) {
         parent, nullptr, GetModuleHandle(nullptr), nullptr);
     SendMessage(state->hostMetricsLabel, WM_SETFONT, (WPARAM)g_fontNormal, TRUE);
 
-    // Banner (460x60) - se muestra en la parte inferior
+    // Banner (460x60) - FIJO al pie de la ventana, visible en TODAS las pestañas
+    // Posición: centrado horizontalmente, pegado al fondo
+    int bannerY = WINDOW_HEIGHT - BANNER_HEIGHT - 45;  // 45 = margen inferior + título ventana
+    int bannerX = (WINDOW_WIDTH - BANNER_WIDTH) / 2;   // Centrado
     state->bannerStatic = CreateWindowW(L"STATIC", L"",
         WS_CHILD | WS_VISIBLE | SS_BITMAP | SS_CENTERIMAGE,
-        MARGIN, contentY + 203, BANNER_WIDTH, BANNER_HEIGHT,
+        bannerX, bannerY, BANNER_WIDTH, BANNER_HEIGHT,
         parent, nullptr, GetModuleHandle(nullptr), nullptr);
 
     // === VIEWER CONTROLS ===
